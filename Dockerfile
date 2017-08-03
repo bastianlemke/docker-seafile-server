@@ -20,12 +20,12 @@ ENV SEAFILE_MAJOR ${SEAFILE_MAJOR}
 # all apt caches
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q --fix-missing && \
 	apt-get -y install python wget nginx && \
-	apt-get -y install python2.7 libpython2.7 python-setuptools python-imaging python-ldap python-urllib3 sqlite3 ffmpeg && \
+	apt-get -y install python2.7 libpython2.7 python-setuptools python-imaging python-ldap python-urllib3 sqlite3 ffmpeg python-pip && \
 	apt-get autoclean && rm -rf /var/lib/apt/lists/* && \
 	rm -rf /usr/share/locale/* && rm -rf /usr/share/man/* && rm -rf /usr/share/doc/*
 
 # dependencies for video thumbnail
-pip install pillow moviepy
+RUN pip install --upgrade pip && pip install pillow moviepy
 
 # download and extract seafile release
 RUN mkdir seafile && cd /seafile && \
