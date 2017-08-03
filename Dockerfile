@@ -11,22 +11,25 @@ VOLUME /data
 # make sure that SEAFILE_MAJOR matches SEAFILE_VERSION!
 # additional the seafile versions may be passed as --build-arg variables
 # thus overriding this default!
-ARG SEAFILE_VERSION=6.0.6
+ARG SEAFILE_VERSION=6.1.1
 ENV SEAFILE_VERSION ${SEAFILE_VERSION}
-ARG SEAFILE_MAJOR=6.0
+ARG SEAFILE_MAJOR=6.1
 ENV SEAFILE_MAJOR ${SEAFILE_MAJOR}
 
 # Install seafile dependencies and make sure to clean
 # all apt caches
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q --fix-missing && \
 	apt-get -y install python wget nginx && \
-	apt-get -y install python2.7 libpython2.7 python-setuptools python-imaging python-ldap python-urllib3 sqlite3 && \
+	apt-get -y install python2.7 libpython2.7 python-setuptools python-imaging python-ldap python-urllib3 sqlite3 ffmpeg && \
 	apt-get autoclean && rm -rf /var/lib/apt/lists/* && \
 	rm -rf /usr/share/locale/* && rm -rf /usr/share/man/* && rm -rf /usr/share/doc/*
 
+# dependencies for video thumbnail
+pip install pillow moviepy
+
 # download and extract seafile release
 RUN mkdir seafile && cd /seafile && \
-	wget -O - https://bintray.com/artifact/download/seafile-org/seafile/seafile-server_${SEAFILE_VERSION}_x86-64.tar.gz | tar xzvf -
+	wget -O - https://download.seadrive.org/seafile-server_${SEAFILE_VERSION}_x86-64.tar.gz | tar xzvf -
 
 # run initial seafile setup script with initial placeholder
 # values which will be patched in the container start script
