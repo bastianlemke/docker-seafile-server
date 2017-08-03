@@ -11,7 +11,7 @@ VOLUME /data
 # make sure that SEAFILE_MAJOR matches SEAFILE_VERSION!
 # additional the seafile versions may be passed as --build-arg variables
 # thus overriding this default!
-ARG SEAFILE_VERSION=6.0.5
+ARG SEAFILE_VERSION=6.0.6
 ENV SEAFILE_VERSION ${SEAFILE_VERSION}
 ARG SEAFILE_MAJOR=6.0
 ENV SEAFILE_MAJOR ${SEAFILE_MAJOR}
