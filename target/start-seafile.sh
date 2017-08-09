@@ -11,6 +11,7 @@ if [[ ! -f /data/seahub.db ]] && [[ ! -f /data/seahub-data ]]; then
     cp /seafile/seahub.db /data/
     cp -rv /seafile/seahub-data /data
     cp -rv /seafile/seafile-data /data
+    cp -rv /seafile/ccnet /data
 
     # initialize seafile major version in /data folder
     echo -n ${SEAFILE_MAJOR} > /data/seafile_version
@@ -18,10 +19,11 @@ fi
 
 # remove initial seafile data files and replace
 # them my symlinks to /data folder
-rm -rf /seafile/seahub-data /seafile/seafile-data /seafile/seahub.db
+rm -rf /seafile/seahub-data /seafile/seafile-data /seafile/seahub.db /seafile/ccnet
 ln -s /data/seahub-data /seafile
 ln -s /data/seahub.db /seafile
 ln -s /data/seafile-data /seafile
+ln -s /data/ccnet /seafile
 
 echo "Adapting configuration of seafile service:"
 echo " - hostname: ${SEAFILE_HOSTNAME}"
@@ -79,10 +81,47 @@ else
   protocol="https"
 fi
 
+# overwrite protocol, to support an encrypted reverse proxy
+if [ -z "$PROTOCOL" ]; then
+  protocol="$PROTOCOL"
+fi
+
 # patch seafile and seahub configuration for nginx
 sed -i "s@SERVICE\_URL.*@SERVICE\_URL = $protocol\:\/\/${SEAFILE_HOSTNAME}\:${SEAFILE_EXTERNAL_PORT}@g" /seafile/conf/ccnet.conf
 echo "FILE_SERVER_ROOT = '$protocol://${SEAFILE_HOSTNAME}:${SEAFILE_EXTERNAL_PORT}/seafhttp'" >> /seafile/conf/seahub_settings.py
 
+#
+# configure email settings
+#
+
+SEAHUB_CONFIG=/seafile/conf/seahub_settings.py
+CONFIG_HEADER="# Configuration - start"
+CONFIG_FOOTER="# Configuration - end"
+
+if grep -q "$CONFIG_HEADER" "$SEAHUB_CONFIG"; then
+        sed "/$CONFIG_HEADER/,/$CONFIG_FOOTER/d" "$SEAHUB_CONFIG" -i
+fi
+
+if [ -z "$EMAIL_HOST" ]; then
+	echo "Email sending not configured"
+else
+	echo "Configuring email notifications"
+	echo "  - host: $EMAIL_HOST"
+	echo "  - user: $EMAIL_HOST_USER"
+	echo "  - tls:  $EMAIL_USE_TLS"
+	echo "  - port: $EMAIL_PORT"
+	cat <<EOF >> $SEAHUB_CONFIG
+$CONFIG_HEADER
+EMAIL_USE_TLS = $EMAIL_USE_TLS
+EMAIL_HOST = '$EMAIL_HOST'
+EMAIL_HOST_USER = '$EMAIL_HOST_USER'
+EMAIL_HOST_PASSWORD = '$EMAIL_HOST_PASSWORD'
+EMAIL_PORT = $EMAIL_PORT
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+SERVER_EMAIL = EMAIL_HOST_USER
+$CONFIG_FOOTER
+EOF
+fi
 #
 # start the services
 #

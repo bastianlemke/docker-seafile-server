@@ -175,6 +175,32 @@ Ignored when `USE_SSL` equals `off`.
 The path to the SSL private key file.
 Ignored when `USE_SSL` equals `off`.
 
+### PROTOCOL
+
+ * *default:* http (when `USE_SSL` equals `off`) / https (when `USE_SSL` equals `on`
+
+Can be overriden e.g. to support an encrypted reverse proxy (in this case `USE_SSL` has to be set to `off` and `PROTOCOL` to `https`)
+
+### EMAIL_USE_TLS
+
+see https://manual.seafile.com/config/sending_email.html
+
+### EMAIL_HOST
+
+see https://manual.seafile.com/config/sending_email.html
+
+### EMAIL_HOST_USER
+
+see https://manual.seafile.com/config/sending_email.html
+
+### EMAIL_HOST_PASSWORD
+
+see https://manual.seafile.com/config/sending_email.html
+
+### EMAIL_PORT
+
+see https://manual.seafile.com/config/sending_email.html
+
 ## License
 
 Boost License. See [LICENSE.txt](LICENSE.txt) for more details.
