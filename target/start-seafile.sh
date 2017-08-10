@@ -82,7 +82,7 @@ else
 fi
 
 # overwrite protocol, to support an encrypted reverse proxy
-if [ -z "$PROTOCOL" ]; then
+if [ -n "$PROTOCOL" ]; then
   protocol="$PROTOCOL"
 fi
 
